@@ -3,7 +3,6 @@ import random
 import logging
 from pathlib import Path
 import pandas as pd
-import numpy as np
 from pytrends.request import TrendReq
 
 # 1. Konfiguracja Loggera
@@ -42,12 +41,12 @@ def fetch_batch_for_region(brand_name, region, timeframe='today 3-m'):
     pytrends = TrendReq(hl='pl-PL', tz=local_tz, retries=2, backoff_factor=10)
 
     # Tłumaczymy kod UK na GB wymagany przez API Google Trends
-    api_region = 'GB' if region == 0 else region
+    api_region = 'GB' if region == 'UK' else region
 
     logger.info(f"Budowanie zapytania dla regionu {region}, marki: {brand_name}")
 
     try:
-        pytrends.build_payload(kw_list=[brand_name], timeframe=timeframe, geo=region)
+        pytrends.build_payload(kw_list=[brand_name], timeframe=timeframe, geo=api_region)
         df = pytrends.interest_over_time()
 
         if df.empty:
