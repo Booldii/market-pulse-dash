@@ -7,9 +7,7 @@ from pytrends.request import TrendReq
 
 # 1. Konfiguracja Loggera
 logging.basicConfig(
-    level=logging.INFO,
-    format='{asctime} - {levelname} - {message}',
-    style='{'
+    level=logging.INFO, format="{asctime} - {levelname} - {message}", style="{"
 )
 logger = logging.getLogger(__name__)
 
@@ -26,27 +24,30 @@ RAW_DATA_DIR.mkdir(parents=True, exist_ok=True)
 CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
 
 REGION_TZ_MAP = {
-    'AU': -600, # Sydney
-    'DE': -60,  # Berlin
-    'US': 300,  # Nowy Jork
-    'UK': 0,    # Londyn
-    'CA': 300,  # Toronto
-    'IN': -330  # New Delhi
+    "AU": -600,  # Sydney
+    "DE": -60,  # Berlin
+    "US": 300,  # Nowy Jork
+    "UK": 0,  # Londyn
+    "CA": 300,  # Toronto
+    "IN": -330,  # New Delhi
 }
 
-def fetch_batch_for_region(brand_name, region, timeframe='today 3-m'):
+
+def fetch_batch_for_region(brand_name, region, timeframe="today 3-m"):
     """Funkcja pobierająca paczkę danych i obsługująca połączenie z API."""
 
     local_tz = REGION_TZ_MAP.get(region, 0)
-    pytrends = TrendReq(hl='pl-PL', tz=local_tz, retries=2, backoff_factor=10)
+    pytrends = TrendReq(hl="pl-PL", tz=local_tz, retries=2, backoff_factor=10)
 
     # Tłumaczymy kod UK na GB wymagany przez API Google Trends
-    api_region = 'GB' if region == 'UK' else region
+    api_region = "GB" if region == "UK" else region
 
     logger.info(f"Budowanie zapytania dla regionu {region}, marki: {brand_name}")
 
     try:
-        pytrends.build_payload(kw_list=[brand_name], timeframe=timeframe, geo=api_region)
+        pytrends.build_payload(
+            kw_list=[brand_name], timeframe=timeframe, geo=api_region
+        )
         df = pytrends.interest_over_time()
 
         if df.empty:
@@ -54,15 +55,15 @@ def fetch_batch_for_region(brand_name, region, timeframe='today 3-m'):
             return None
 
         # Sprzątanie technicznej kolumny
-        if 'isPartial' in df.columns:
-            df = df.drop(columns=['isPartial'])
+        if "isPartial" in df.columns:
+            df = df.drop(columns=["isPartial"])
 
         # Zmieniamy strukture wyplutego df'a w celu łatwiejszej, pozniejszsej agregacji
-        df = df.rename(columns={brand_name: 'trend_index'})
-        df['region'] = region
-        df['brand'] = brand_name
+        df = df.rename(columns={brand_name: "trend_index"})
+        df["region"] = region
+        df["brand"] = brand_name
         df = df.reset_index()
-        return df[['date', 'region', 'brand', 'trend_index']]
+        return df[["date", "region", "brand", "trend_index"]]
 
     except Exception as e:
         logger.error(f"Błąd podczas pobierania danych z Google Trends: {e}")
@@ -71,10 +72,10 @@ def fetch_batch_for_region(brand_name, region, timeframe='today 3-m'):
 
 def main():
     # Pełny okres z jakiego pochadza zamowienia
-    df_source = pd.read_csv(RAW_DATA_DIR / 'retail_pricing_demand_100k.csv')
-    df_source['date'] = pd.to_datetime(df_source['date'])
-    start_date = df_source['date'].min().strftime('%Y-%m-%d')
-    end_date = df_source['date'].max().strftime('%Y-%m-%d')
+    df_source = pd.read_csv(RAW_DATA_DIR / "retail_pricing_demand_100k.csv")
+    df_source["date"] = pd.to_datetime(df_source["date"])
+    start_date = df_source["date"].min().strftime("%Y-%m-%d")
+    end_date = df_source["date"].max().strftime("%Y-%m-%d")
     timeframe = f"{start_date} {end_date}"
 
     # nazwy obecnych kategorii wejściowych
@@ -119,4 +120,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
