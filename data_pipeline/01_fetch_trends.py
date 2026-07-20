@@ -14,7 +14,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # 2. Definicja ścieżek (dynamicznie względem pliku skryptu)
-# Zakładamy strukturę: market-pulse-dashboard/data_pipeline/fetch_trends.py
+# Zakładamy strukturę: market-pulse-dashboard/data_pipeline/01_fetch_trends.py
 # Chcemy trafić do: market-pulse-dashboard/data/raw/
 CURRENT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = CURRENT_DIR.parent
