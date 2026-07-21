@@ -12,5 +12,6 @@ wheels/
 # Virtual environments
 .venv
 
-# Raw data files
+# Data files
 data/raw/*
+data/processed/*

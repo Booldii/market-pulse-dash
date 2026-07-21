@@ -11,13 +11,12 @@ RAW_DATA_DIR = PROJECT_DIR / "data" / "raw"
 PROCESSED_DATA_DIR = PROJECT_DIR / "data" / "processed"
 
 
-def marge_and_impure(df_sales, df_trends):
+def marge_and_impute(df_sales, df_trends):
     """Łaczy zbudowane cechy z pierwotnym zbiorem i uzupełnia braki"""
 
     df_master = df_sales.merge(df_trends, on=["date", "region", "brand"], how="left")
 
-    trend_cols = ["ma_3", "ma_7", "trend_momentum"]
-    df_master[trend_cols] = df_master[trend_cols].fillna(0)
+    df_master["trend_momentum"] = df_master["trend_momentum"].fillna(0)
 
     return df_master
 
@@ -38,7 +37,7 @@ def main():
 
     df_trends["date"] = pd.to_datetime(df_trends["date"])
 
-    df_master = marge_and_impure(df_sales, df_trends)
+    df_master = marge_and_impute(df_sales, df_trends)
     df_master.to_parquet(output_path, index=False)
 
 

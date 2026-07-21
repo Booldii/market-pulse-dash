@@ -41,7 +41,7 @@ def calculate_rolling_features(df):
 
     df["trend_momentum"] = df["ma_3"] - df["ma_7"]
 
-    final_cols = ["date", "region", "brand", "ma_3", "ma_7", "trend_momentum"]
+    final_cols = ["date", "region", "brand", "trend_momentum"]
     return df[final_cols]
 
 
